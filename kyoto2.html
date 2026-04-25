@@ -259,7 +259,7 @@
     </div>
 
     <div class="disclaimer">
-        ※ご指示に合わせ、共通テスト英語は「工学部以外の全学部でリーディングとリスニングを 3:1（150点:50点の比率）で傾斜配点」とし、工学部のみRとLの点数をそのまま合算する（1:1）仕様になっています。<br>
+        ※共通テスト英語は「工学部以外の全学部でリーディングとリスニングを 3:1（150点:50点の比率）で傾斜配点」とし、工学部のみRとLの点数をそのまま合算する（1:1）仕様になっています。<br>
     </div>
 </div>
 
@@ -275,22 +275,22 @@
 
     // 理系：工学部以外の全学部で英語を R:L = 3:1 に変更（薬学部は40点満点なのでR30:L10）
     const rikeiData = [
-        { name: "総人(理)", min: 454.00, ct: { koku: 0, math: 0, eng: 0, soc: 100, sci: 0, info: 25 }, niji: { koku: 150, math: 200, eng: 150, soc: 0, sci: 200 } },
-        { name: "教育(理)", min: 523.18, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 15 }, niji: { koku: 150, math: 200, eng: 200, soc: 0, sci: 100 } },
-        { name: "経済(理)", min: 555.62, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 50 }, niji: { koku: 150, math: 300, eng: 200, soc: 0, sci: 0 } },
+        { name: "総人理", min: 454.00, ct: { koku: 0, math: 0, eng: 0, soc: 100, sci: 0, info: 25 }, niji: { koku: 150, math: 200, eng: 150, soc: 0, sci: 200 } },
+        { name: "教育理", min: 523.18, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 15 }, niji: { koku: 150, math: 200, eng: 200, soc: 0, sci: 100 } },
+        { name: "経済理", min: 555.62, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 50 }, niji: { koku: 150, math: 300, eng: 200, soc: 0, sci: 0 } },
         { name: "理", min: 730.25, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 25, sci: 50, info: 25 }, niji: { koku: 150, math: 300, eng: 225, soc: 0, sci: 300 } },
         
-        { name: "医(医)", min: 876.62, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 25 }, niji: { koku: 150, math: 250, eng: 300, soc: 0, sci: 300 } },
-        { name: "医(人健)", min: 518.50, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 25 }, niji: { koku: 150, math: 200, eng: 200, soc: 0, sci: 200 } },
+        { name: "医医", min: 876.62, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 25 }, niji: { koku: 150, math: 250, eng: 300, soc: 0, sci: 300 } },
+        { name: "人健", min: 518.50, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 25 }, niji: { koku: 150, math: 200, eng: 200, soc: 0, sci: 200 } },
         { name: "薬", min: 512.06, ct: { koku: 40, math: 40, engR: 30, engL: 10, soc: 40, sci: 40, info: 20 }, niji: { koku: 100, math: 200, eng: 200, soc: 0, sci: 200 } },
         
         // 工学部は R:L = 1:1 （合計点を使用）のまま維持
-        { name: "工(地球工)", min: 581.20, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
-        { name: "工(建築)", min: 596.32, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
-        { name: "工(物理工)", min: 615.33, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
-        { name: "工(電気電子工)", min: 602.15, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
-        { name: "工(情報)", min: 645.49, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
-        { name: "工(理工化学)", min: 581.15, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "地球工", min: 581.20, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "建築", min: 596.32, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "物工", min: 615.33, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "電電", min: 602.15, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "情報", min: 645.49, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "工化", min: 581.15, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
 
         { name: "農", min: 629.98, ct: { koku: 70, math: 50, engR: 37.5, engL: 12.5, soc: 100, sci: 50, info: 30 }, niji: { koku: 100, math: 200, eng: 200, soc: 0, sci: 200 } }
     ];
