@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>京大入試 合格距離シミュレーター (令和8年度)</title>
+    <style>
+        :root {
+            --primary-color: #0b2046;
+            --secondary-color: #f0f4f8;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #d32f2f;
+            font-size: 14px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .note {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 10px 15px;
+            font-size: 13px;
+            margin-bottom: 25px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .section-box {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: #fafafa;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 8px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 30px;
+        }
+
+        @media (max-width: 600px) {
+            .input-grid { grid-template-columns: 1fr; }
+        }
+
+        .input-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .input-label {
+            font-weight: bold;
+            color: #444;
+            font-size: 15px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            width: 70px;
+            padding: 6px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: right;
+            margin-right: 6px;
+        }
+
+        select {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .btn-calc {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:hover {
+            opacity: 0.9;
+        }
+
+        #result-area {
+            display: none;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+        .result-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        #result-list {
+            font-size: 20px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .disclaimer {
+            font-size: 12px;
+            color: #888;
+            margin-top: 30px;
+            line-height: 1.5;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>学部別 合否判定シミュレーター</h1>
+    <div class="subtitle">※令和8年度 最新版</div>
+
+    <div class="note">
+        <strong>【入力時の注意点】</strong><br>
+        二次試験の点数は、<strong>素点（例：理系数学なら200点満点、英語なら150点満点）</strong>で入力してください。入力された得点率をもとに、各学部の独自配点（例：理学部数学なら300点満点）へ自動で換算して合否判定を行います。
+    </div>
+
+    <div class="section-box">
+        <h2>① 志望区分</h2>
+        <div class="input-row" style="border: none;">
+            <div class="input-label" style="width: 100px;">文理選択</div>
+            <div style="flex-grow: 1;">
+                <select id="course-select" onchange="toggleSubjects()">
+                    <option value="bunkei">文系</option>
+                    <option value="rikei">理系</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h2>② 共通テスト（自己採点・素点）</h2>
+        <div class="input-grid">
+            <div class="input-row">
+                <div class="input-label">国語</div>
+                <div class="input-wrapper"><input type="number" id="ct-koku" placeholder="0" min="0" max="200"> / 200</div>
+            </div>
+            <div class="input-row">
+                <div class="input-label">数学 (ⅠA・ⅡBC合計)</div>
+                <div class="input-wrapper"><input type="number" id="ct-math" placeholder="0" min="0" max="200"> / 200</div>
+            </div>
+            <div class="input-row">
+                <div class="input-label">英語 (リーディング)</div>
+                <div class="input-wrapper"><input type="number" id="ct-eng-r" placeholder="0" min="0" max="100"> / 100</div>
+            </div>
+            <div class="input-row">
+                <div class="input-label">英語 (リスニング)</div>
+                <div class="input-wrapper"><input type="number" id="ct-eng-l" placeholder="0" min="0" max="100"> / 100</div>
+            </div>
+            <div class="input-row">
+                <div class="input-label">社会</div>
+                <div class="input-wrapper"><input type="number" id="ct-soc" placeholder="0" min="0" max="200"> / <span id="ct-max-soc">200</span></div>
+            </div>
+            <div class="input-row">
+                <div class="input-label">理科</div>
+                <div class="input-wrapper"><input type="number" id="ct-sci" placeholder="0" min="0" max="200"> / <span id="ct-max-sci">100</span></div>
+            </div>
+            <div class="input-row" style="grid-column: 1 / -1; width: calc(50% - 15px);">
+                <div class="input-label">情報</div>
+                <div class="input-wrapper"><input type="number" id="ct-info" placeholder="0" min="0" max="100"> / 100</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h2>③ 二次試験（標準配点での予想素点）</h2>
+        <div class="input-grid">
+            <div class="input-row">
+                <div class="input-label">国語</div>
+                <div class="input-wrapper"><input type="number" id="niji-koku" placeholder="0" min="0" max="150"> / <span id="niji-max-koku">150</span></div>
+            </div>
+            <div class="input-row">
+                <div class="input-label">数学</div>
+                <div class="input-wrapper"><input type="number" id="niji-math" placeholder="0" min="0" max="300"> / <span id="niji-max-math">150</span></div>
+            </div>
+            <div class="input-row">
+                <div class="input-label">外国語 (英語)</div>
+                <div class="input-wrapper"><input type="number" id="niji-eng" placeholder="0" min="0" max="250"> / 150</div>
+            </div>
+            <div class="input-row" id="row-niji-soc">
+                <div class="input-label">社会</div>
+                <div class="input-wrapper"><input type="number" id="niji-soc" placeholder="0" min="0" max="100"> / 100</div>
+            </div>
+            <div class="input-row" id="row-niji-sci" style="display: none;">
+                <div class="input-label">理科 (2科目)</div>
+                <div class="input-wrapper"><input type="number" id="niji-sci" placeholder="0" min="0" max="350"> / 200</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-calc" onclick="calculateResult()">傾斜配点で結果を見る</button>
+
+    <div id="result-area">
+        <div class="result-title">④ 判定結果（令和8年度基準）</div>
+        <div id="result-list"></div>
+    </div>
+
+    <div class="disclaimer">
+        ※ご指示に合わせ、共通テスト英語は「工学部以外の全学部でリーディングとリスニングを 3:1（150点:50点の比率）で傾斜配点」とし、工学部のみRとLの点数をそのまま合算する（1:1）仕様になっています。<br>
+    </div>
+</div>
+
+<script>
+    // 文系：全学部で英語を R:L = 3:1 に変更（総人以外は50点満点等に合わせて比率計算、法学部は200点満点なのでR150:L50）
+    const bunkeiData = [
+        { name: "総人(文)", min: 530.50, ct: { koku: 0, math: 0, eng: 0, soc: 50, sci: 100, info: 25 }, niji: { koku: 150, math: 200, eng: 200, soc: 100, sci: 0 } },
+        { name: "文", min: 488.25, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 15 }, ctScale: 250 / 265, niji: { koku: 150, math: 150, eng: 150, soc: 100, sci: 0 } },
+        { name: "教育(文)", min: 564.66, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 15 }, niji: { koku: 150, math: 150, eng: 150, soc: 100, sci: 0 } },
+        { name: "法", min: 558.08, ct: { koku: 200, math: 200, engR: 150, engL: 50, soc: 200, sci: 100, info: 50 }, ctScale: 285 / 950, niji: { koku: 150, math: 150, eng: 150, soc: 0, sci: 0 } },
+        { name: "経済(文)", min: 555.75, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 50 }, niji: { koku: 150, math: 150, eng: 150, soc: 0, sci: 0 } }
+    ];
+
+    // 理系：工学部以外の全学部で英語を R:L = 3:1 に変更（薬学部は40点満点なのでR30:L10）
+    const rikeiData = [
+        { name: "総人(理)", min: 454.00, ct: { koku: 0, math: 0, eng: 0, soc: 100, sci: 0, info: 25 }, niji: { koku: 150, math: 200, eng: 150, soc: 0, sci: 200 } },
+        { name: "教育(理)", min: 523.18, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 15 }, niji: { koku: 150, math: 200, eng: 200, soc: 0, sci: 100 } },
+        { name: "経済(理)", min: 555.62, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 50 }, niji: { koku: 150, math: 300, eng: 200, soc: 0, sci: 0 } },
+        { name: "理", min: 730.25, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 25, sci: 50, info: 25 }, niji: { koku: 150, math: 300, eng: 225, soc: 0, sci: 300 } },
+        
+        { name: "医(医)", min: 876.62, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 25 }, niji: { koku: 150, math: 250, eng: 300, soc: 0, sci: 300 } },
+        { name: "医(人健)", min: 518.50, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 25 }, niji: { koku: 150, math: 200, eng: 200, soc: 0, sci: 200 } },
+        { name: "薬", min: 512.06, ct: { koku: 40, math: 40, engR: 30, engL: 10, soc: 40, sci: 40, info: 20 }, niji: { koku: 100, math: 200, eng: 200, soc: 0, sci: 200 } },
+        
+        // 工学部は R:L = 1:1 （合計点を使用）のまま維持
+        { name: "工(地球工)", min: 581.20, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "工(建築)", min: 596.32, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "工(物理工)", min: 615.33, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "工(電気電子工)", min: 602.15, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "工(情報)", min: 645.49, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+        { name: "工(理工化学)", min: 581.15, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
+
+        { name: "農", min: 629.98, ct: { koku: 70, math: 50, engR: 37.5, engL: 12.5, soc: 100, sci: 50, info: 30 }, niji: { koku: 100, math: 200, eng: 200, soc: 0, sci: 200 } }
+    ];
+
+    function toggleSubjects() {
+        const course = document.getElementById('course-select').value;
+        const rowNijiSoc = document.getElementById('row-niji-soc');
+        const rowNijiSci = document.getElementById('row-niji-sci');
+        
+        const ctMaxSoc = document.getElementById('ct-max-soc');
+        const ctMaxSci = document.getElementById('ct-max-sci');
+        
+        const nijiMaxKoku = document.getElementById('niji-max-koku');
+        const nijiMaxMath = document.getElementById('niji-max-math');
+
+        if (course === 'bunkei') {
+            ctMaxSoc.innerText = '200';
+            ctMaxSci.innerText = '100';
+            nijiMaxKoku.innerText = '150';
+            nijiMaxMath.innerText = '150';
+            rowNijiSoc.style.display = 'flex';
+            rowNijiSci.style.display = 'none';
+        } else {
+            ctMaxSoc.innerText = '100';
+            ctMaxSci.innerText = '200';
+            nijiMaxKoku.innerText = '100'; 
+            nijiMaxMath.innerText = '200';
+            rowNijiSoc.style.display = 'none';
+            rowNijiSci.style.display = 'flex';
+        }
+    }
+
+    window.onload = toggleSubjects;
+
+    function getVal(id) { return Number(document.getElementById(id).value) || 0; }
+    
+    // 小数点第3位以下を切り捨てて、小数点第2位までにする関数
+    function truncateToTwo(num) {
+        // 浮動小数点の誤差を考慮し、極小値を足してから計算
+        return Math.floor(num * 100 + 0.0000001) / 100;
+    }
+
+    function calculateResult() {
+        const course = document.getElementById('course-select').value;
+        const targetData = (course === 'bunkei') ? bunkeiData : rikeiData;
+
+        const ctBase = { koku: 200, math: 200, engR: 100, engL: 100, info: 100, soc: course === 'bunkei' ? 200 : 100, sci: course === 'bunkei' ? 100 : 200 };
+        const nijiBase = { koku: course === 'bunkei' ? 150 : 100 , eng: 150, soc: 100, sci: 200, math: course === 'bunkei' ? 150 : 200 };
+
+        const inputCt = { 
+            koku: getVal('ct-koku'), 
+            math: getVal('ct-math'), 
+            engR: getVal('ct-eng-r'), 
+            engL: getVal('ct-eng-l'), 
+            soc: getVal('ct-soc'), 
+            sci: getVal('ct-sci'), 
+            info: getVal('ct-info') 
+        };
+        const inputNiji = { koku: getVal('niji-koku'), math: getVal('niji-math'), eng: getVal('niji-eng'), soc: getVal('niji-soc'), sci: getVal('niji-sci') };
+
+        const resultList = document.getElementById('result-list');
+        resultList.innerHTML = ''; 
+
+        targetData.forEach(faculty => {
+            // 各科目ごとに計算し、その都度切り捨てを行う
+            const calcScoreStep = (input, base, weight) => {
+                if (!weight || weight <= 0) return 0;
+                const safeInput = input || 0;
+                const safeBase = base || 1;
+                // 傾斜計算の段階で切り捨て
+                const rawScore = (safeInput / safeBase) * weight;
+                return truncateToTwo(rawScore);
+            };
+
+            let ctScore = 0;
+            
+            if (faculty.ct) {
+                ctScore += calcScoreStep(inputCt.koku, ctBase.koku, faculty.ct.koku);
+                ctScore += calcScoreStep(inputCt.math, ctBase.math, faculty.ct.math);
+                ctScore += calcScoreStep(inputCt.soc,  ctBase.soc,  faculty.ct.soc);
+                ctScore += calcScoreStep(inputCt.sci,  ctBase.sci,  faculty.ct.sci);
+                ctScore += calcScoreStep(inputCt.info, ctBase.info, faculty.ct.info);
+
+                if (faculty.ct.engR !== undefined && faculty.ct.engL !== undefined) {
+                    ctScore += calcScoreStep(inputCt.engR, ctBase.engR, faculty.ct.engR);
+                    ctScore += calcScoreStep(inputCt.engL, ctBase.engL, faculty.ct.engL);
+                } else if (faculty.ct.eng !== undefined && faculty.ct.eng > 0) {
+                    const combinedEngInput = (inputCt.engR || 0) + (inputCt.engL || 0);
+                    const combinedEngBase = (ctBase.engR || 100) + (ctBase.engL || 100);
+                    ctScore += calcScoreStep(combinedEngInput, combinedEngBase, faculty.ct.eng);
+                }
+            }
+
+            // 学部全体の共通テスト換算（文・法などの2次スケール）がある場合、ここでも切り捨て
+            if (faculty.ctScale) {
+                ctScore = truncateToTwo(ctScore * faculty.ctScale);
+            }
+
+            let nijiScore = 0;
+            if (faculty.niji) {
+                nijiScore += calcScoreStep(inputNiji.koku, nijiBase.koku, faculty.niji.koku);
+                nijiScore += calcScoreStep(inputNiji.math, nijiBase.math, faculty.niji.math);
+                nijiScore += calcScoreStep(inputNiji.eng,  nijiBase.eng,  faculty.niji.eng);
+                nijiScore += calcScoreStep(inputNiji.soc,  nijiBase.soc,  faculty.niji.soc);
+                nijiScore += calcScoreStep(inputNiji.sci,  nijiBase.sci,  faculty.niji.sci);
+            }
+
+            const totalScore = ctScore + nijiScore;
+            const diffNumber = totalScore - (faculty.min || 0);
+            const isPass = diffNumber >= 0;
+            
+            // 最終表示用の整形
+            const diffDisplay = diffNumber.toFixed(2); 
+
+            const sign = isPass ? '+' : '';
+            const statusLabel = isPass ? '合格⭕' : '不合格❌';
+
+            const div = document.createElement('div');
+            div.innerHTML = `${faculty.name}に${sign}${diffDisplay}点で${statusLabel}`;
+            resultList.appendChild(div);
+        });
+
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('result-area').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
