@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>京大入試 合否判定シミュレーター (令和8年度)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-color: #0b2046;
@@ -137,6 +138,11 @@
             opacity: 0.9;
         }
 
+        .btn-download {
+            background-color: #1a73e8; /* ダウンロードボタンの色 */
+            margin-top: 20px;
+        }
+
         #result-area {
             display: none;
             margin-top: 20px;
@@ -151,9 +157,22 @@
             padding-bottom: 10px;
         }
 
+        /* 画像としてキャプチャする領域のスタイル */
+        #capture-area {
+            background-color: #ffffff; /* 画像化時に背景が透明にならないように白にする */
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .capture-url {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
         #result-list {
             font-size: 20px;
-            line-height: 1.5;
+            line-height: 1.6;
             color: #333;
         }
 
@@ -255,7 +274,13 @@
 
     <div id="result-area">
         <div class="result-title">④ 判定結果（令和8年度）</div>
-        <div id="result-list"></div>
+        
+        <div id="capture-area">
+            <div class="capture-url">(https://rs-dev-kyoto.github.io/kyoto-simu/)</div>
+            <div id="result-list"></div>
+        </div>
+        
+        <button class="btn-calc btn-download" onclick="downloadImage()">判定結果を画像として保存📸</button>
     </div>
 
     <div class="disclaimer">
@@ -414,6 +439,28 @@
 
         document.getElementById('result-area').style.display = 'block';
         document.getElementById('result-area').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 画像として保存する関数
+    function downloadImage() {
+        const captureArea = document.getElementById('capture-area');
+        
+        // html2canvasを使って対象のDOMをキャンバスに描画
+        html2canvas(captureArea, {
+            scale: 2, // 画像を鮮明にするためのスケール
+            backgroundColor: "#ffffff" // 背景を白で固定
+        }).then(canvas => {
+            // 画像データを取得
+            const imgData = canvas.toDataURL("image/png");
+            
+            // ダウンロード用のリンクを作成して自動クリック
+            const link = document.createElement("a");
+            link.href = imgData;
+            link.download = "result.png"; // 保存されるファイル名
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
     }
 </script>
 
