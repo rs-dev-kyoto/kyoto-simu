@@ -77,19 +77,30 @@
             gap: 15px 30px;
         }
 
-        
         @media (max-width: 600px) {
+            /* スマホ表示時の無駄な余白を削る */
+            body { 
+                padding: 10px 5px; 
+            }
+            .container { 
+                padding: 20px 10px; 
+            }
+            #capture-area {
+                padding: 15px 5px;
+            }
+
             .input-grid { grid-template-columns: 1fr; }
             
-            /* スマホで結果を1行に収めるための追加コード */
+            /* 結果を1行に収めるための調整 */
             #result-list {
-                font-size: 14px; /* フォントサイズを小さくする */
+                font-size: 13px; /* 少しだけ小さくして確実に入るように */
             }
             #result-list div {
-                white-space: nowrap; /* 文字の折り返し（改行）を禁止する */
-                letter-spacing: -0.5px; /* 文字間隔を少し詰めて確実に収める */
+                white-space: nowrap; /* 改行を禁止 */
+                letter-spacing: -0.5px; /* 文字間隔を少し詰める */
             }
         }
+        
 
         .input-row {
             display: flex;
