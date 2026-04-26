@@ -134,12 +134,17 @@
             margin-top: 10px;
         }
 
-        .btn-calc:hover {
+        .btn-calc:hover:not(:disabled) {
             opacity: 0.9;
         }
 
+        .btn-calc:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
         .btn-download {
-            background-color: #1a73e8; /* ダウンロードボタンの色 */
+            background-color: #1a73e8;
             margin-top: 20px;
         }
 
@@ -157,9 +162,8 @@
             padding-bottom: 10px;
         }
 
-        /* 画像としてキャプチャする領域のスタイル */
         #capture-area {
-            background-color: #ffffff; /* 画像化時に背景が透明にならないように白にする */
+            background-color: #ffffff;
             padding: 15px;
             border-radius: 8px;
         }
@@ -183,6 +187,50 @@
             line-height: 1.5;
             border-top: 1px solid #eee;
             padding-top: 15px;
+        }
+
+        /* --- スマホ保存用のモーダル（ポップアップ）CSS --- */
+        #image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-text {
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        #generated-image {
+            max-width: 90%;
+            max-height: 70vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            /* 長押しメニューを確実に出すための指定 */
+            -webkit-touch-callout: default;
+        }
+
+        .btn-close {
+            margin-top: 25px;
+            padding: 12px 30px;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -288,8 +336,14 @@
     </div>
 </div>
 
+<div id="image-modal">
+    <div class="modal-text">👇画像を長押し（または右クリック）<br>して保存してください</div>
+    <img id="generated-image" alt="判定結果画像">
+    <button class="btn-close" onclick="closeModal()">閉じる</button>
+</div>
+
 <script>
-    // 文系：全学部で英語を R:L = 3:1 に変更（総人以外は50点満点等に合わせて比率計算、法学部は200点満点なのでR150:L50）
+    // 文系データ
     const bunkeiData = [
         { name: "総人(文)", min: 530.50, ct: { koku: 0, math: 0, eng: 0, soc: 50, sci: 100, info: 25 }, niji: { koku: 150, math: 200, eng: 200, soc: 100, sci: 0 } },
         { name: "文", min: 488.25, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 15 }, ctScale: 250 / 265, niji: { koku: 150, math: 150, eng: 150, soc: 100, sci: 0 } },
@@ -298,7 +352,7 @@
         { name: "経済(文)", min: 555.75, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 50 }, niji: { koku: 150, math: 150, eng: 150, soc: 0, sci: 0 } }
     ];
 
-    // 理系：工学部以外の全学部で英語を R:L = 3:1 に変更（薬学部は40点満点なのでR30:L10）
+    // 理系データ
     const rikeiData = [
         { name: "総人(理)", min: 454.00, ct: { koku: 0, math: 0, eng: 0, soc: 100, sci: 0, info: 25 }, niji: { koku: 150, math: 200, eng: 150, soc: 0, sci: 200 } },
         { name: "教育(理)", min: 523.18, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 15 }, niji: { koku: 150, math: 200, eng: 200, soc: 0, sci: 100 } },
@@ -307,15 +361,12 @@
         { name: "医医", min: 876.62, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 25 }, niji: { koku: 150, math: 250, eng: 300, soc: 0, sci: 300 } },
         { name: "人健", min: 518.50, ct: { koku: 50, math: 50, engR: 37.5, engL: 12.5, soc: 50, sci: 50, info: 25 }, niji: { koku: 150, math: 200, eng: 200, soc: 0, sci: 200 } },
         { name: "薬", min: 512.06, ct: { koku: 40, math: 40, engR: 30, engL: 10, soc: 40, sci: 40, info: 20 }, niji: { koku: 100, math: 200, eng: 200, soc: 0, sci: 200 } },
-        
-        // 工学部は R:L = 1:1 （合計点を使用）のまま維持
         { name: "地工", min: 581.20, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
         { name: "建築", min: 596.32, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
         { name: "物工", min: 615.33, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
         { name: "電電", min: 602.15, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
         { name: "情報", min: 645.49, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
         { name: "工化", min: 581.15, ct: { koku: 25, math: 25, eng: 50, soc: 50, sci: 25, info: 50 }, niji: { koku: 100, math: 250, eng: 200, soc: 0, sci: 250 } },
-
         { name: "農", min: 629.98, ct: { koku: 70, math: 50, engR: 37.5, engL: 12.5, soc: 100, sci: 50, info: 30 }, niji: { koku: 100, math: 200, eng: 200, soc: 0, sci: 200 } }
     ];
 
@@ -351,9 +402,7 @@
 
     function getVal(id) { return Number(document.getElementById(id).value) || 0; }
     
-    // 小数点第3位以下を切り捨てて、小数点第2位までにする関数
     function truncateToTwo(num) {
-        // 浮動小数点の誤差を考慮し、極小値を足してから計算
         return Math.floor(num * 100 + 0.0000001) / 100;
     }
 
@@ -379,12 +428,10 @@
         resultList.innerHTML = ''; 
 
         targetData.forEach(faculty => {
-            // 各科目ごとに計算し、その都度切り捨てを行う
             const calcScoreStep = (input, base, weight) => {
                 if (!weight || weight <= 0) return 0;
                 const safeInput = input || 0;
                 const safeBase = base || 1;
-                // 傾斜計算の段階で切り捨て
                 const rawScore = (safeInput / safeBase) * weight;
                 return truncateToTwo(rawScore);
             };
@@ -408,7 +455,6 @@
                 }
             }
 
-            // 学部全体の共通テスト換算（文・法などの2次スケール）がある場合、ここでも切り捨て
             if (faculty.ctScale) {
                 ctScore = truncateToTwo(ctScore * faculty.ctScale);
             }
@@ -426,7 +472,6 @@
             const diffNumber = totalScore - (faculty.min || 0);
             const isPass = diffNumber >= 0;
             
-            // 最終表示用の整形
             const diffDisplay = diffNumber.toFixed(2); 
 
             const sign = isPass ? '+' : '';
@@ -441,26 +486,39 @@
         document.getElementById('result-area').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 画像として保存する関数
+    // --- スマホ向け画像表示ロジック ---
     function downloadImage() {
         const captureArea = document.getElementById('capture-area');
+        const btn = document.querySelector('.btn-download');
         
-        // html2canvasを使って対象のDOMをキャンバスに描画
+        // 処理中であることをユーザーに伝える
+        btn.innerText = '画像を作成中...⏳';
+        btn.disabled = true;
+        
         html2canvas(captureArea, {
-            scale: 2, // 画像を鮮明にするためのスケール
-            backgroundColor: "#ffffff" // 背景を白で固定
+            scale: 2, 
+            backgroundColor: "#ffffff"
         }).then(canvas => {
-            // 画像データを取得
             const imgData = canvas.toDataURL("image/png");
             
-            // ダウンロード用のリンクを作成して自動クリック
-            const link = document.createElement("a");
-            link.href = imgData;
-            link.download = "result.png"; // 保存されるファイル名
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // モーダル（ポップアップ）内のimgタグに画像データをセット
+            document.getElementById('generated-image').src = imgData;
+            // モーダルを表示する
+            document.getElementById('image-modal').style.display = 'flex';
+            
+            // ボタンの表記を元に戻す
+            btn.innerText = '判定結果を画像として保存📸';
+            btn.disabled = false;
+        }).catch(err => {
+            alert('画像の作成に失敗しました。');
+            btn.innerText = '判定結果を画像として保存📸';
+            btn.disabled = false;
         });
+    }
+
+    // モーダルを閉じる関数
+    function closeModal() {
+        document.getElementById('image-modal').style.display = 'none';
     }
 </script>
 
