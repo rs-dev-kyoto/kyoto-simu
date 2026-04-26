@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>京大入試 合格距離シミュレーター (令和8年度)</title>
+    <title>京大入試 合否判定シミュレーター (令和8年度)</title>
     <style>
         :root {
             --primary-color: #0b2046;
@@ -192,7 +192,7 @@
     </div>
 
     <div class="section-box">
-        <h2>② 共通テスト（自己採点・素点）</h2>
+        <h2>② 共通テスト（素点）</h2>
         <div class="input-grid">
             <div class="input-row">
                 <div class="input-label">国語</div>
@@ -405,7 +405,7 @@
             const diffDisplay = diffNumber.toFixed(2); 
 
             const sign = isPass ? '+' : '';
-            const statusLabel = isPass ? '合格⭕' : '不合格❌';
+            const statusLabel = isPass ? '合格💮' : '不合格❌';
 
             const div = document.createElement('div');
             div.innerHTML = `${faculty.name}に${sign}${diffDisplay}点で${statusLabel}`;
